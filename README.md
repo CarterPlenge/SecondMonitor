@@ -7,7 +7,7 @@ Purpose:
 ## Summary
 A desktop calendar application that displays your Google Calendar events and tasks on your secondary monitor.
 ### Example rendering:
-![Example Rendering](./example.png)
+![Example Rendering](./public/images/exampleRender.png)
 
 ## Setup
 
