@@ -3,25 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock Wallpaper</title>
+    <title>Clock & Calendar Wallpaper</title>
     <style>
         body {
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-end;
             height: 100vh;
             background: transparent;
             color: white;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
         }
         .clock {
-            font-size: 5rem;
+            font-size: 2.5rem;
             font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .calendar {
+            font-size: 1.2rem;
+            text-align: left;
+            max-width: 400px;
+            width: 100%;
+        }
+        .event {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            position: relative;
+        }
+        .event.ongoing {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 3px solid #4CAF50;
+        }
+        .event-time {
+            color: #ccc;
+            font-size: 0.9em;
+        }
+        .no-events {
+            text-align: center;
+            color: #888;
+            font-style: italic;
+        }
+        .tasks {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            text-align: left;
+            max-width: 400px;
+            width: 100%;
+        }
+        .task {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            border-left: 3px solid #FFA500;
+        }
+        .task-due {
+            color: #ccc;
+            font-size: 0.9em;
+        }
+        .section-title {
+            font-size: 1.1em;
+            color: #ccc;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 5px;
         }
     </style>
 </head>
 <body>
     <div class="clock" id="clock">00:00:00</div>
+    <div class="section-title">Events</div>
+    <div class="calendar" id="calendar"></div>
+    <div class="section-title">Tasks</div>
+    <div class="tasks" id="tasks"></div>
     <script>
         function updateClock() {
             const now = new Date();
@@ -30,6 +91,60 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
+
+        function formatEventTime(event) {
+            const start = new Date(event.start.dateTime || event.start.date);
+            const end = new Date(event.end.dateTime || event.end.date);
+            const now = new Date();
+            
+            // Check if event is ongoing
+            const isOngoing = start <= now && end > now;
+            
+            // Format the time
+            const timeStr = event.start.dateTime ? 
+                `${start.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${end.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}` :
+                'All day';
+            
+            return { timeStr, isOngoing };
+        }
+
+        require('electron').ipcRenderer.on('calendar-update', (event, data) => {
+            const { events, tasks } = data;
+            const calendarDiv = document.getElementById('calendar');
+            const tasksDiv = document.getElementById('tasks');
+            
+            // Update events
+            if (events.length === 0) {
+                calendarDiv.innerHTML = '<div class="no-events">No more events today</div>';
+            } else {
+                calendarDiv.innerHTML = events.map(event => {
+                    const { timeStr, isOngoing } = formatEventTime(event);
+                    return `
+                        <div class="event ${isOngoing ? 'ongoing' : ''}">
+                            <strong>${event.summary}</strong><br>
+                            <span class="event-time">${timeStr}</span>
+                            ${isOngoing ? '<span class="event-status"> (Ongoing)</span>' : ''}
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Update tasks
+            if (tasks.length === 0) {
+                tasksDiv.innerHTML = '<div class="no-events">No tasks due today</div>';
+            } else {
+                tasksDiv.innerHTML = tasks.map(task => {
+                    const dueDate = task.due ? new Date(task.due) : null;
+                    const dueTime = dueDate ? dueDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'No due time';
+                    return `
+                        <div class="task">
+                            <strong>${task.title}</strong><br>
+                            <span class="task-due">Due: ${dueTime}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+        });
     </script>
 </body>
 </html>

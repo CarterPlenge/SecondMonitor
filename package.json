@@ -1,11 +1,13 @@
 {
   "name": "secondmonitor",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Desktop Calendar for Second Monitor",
+  "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron main.js"
+    "start": "electron .",
+    "auth": "node auth.js",
+    "build": "electron-builder",
+    "dist": "electron-builder --win"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,37 @@
   },
   "homepage": "https://github.com/CarterPlenge/SecondMonitor#readme",
   "dependencies": {
-    "electron": "^35.1.2"
+    "auto-launch": "^5.0.5",
+    "googleapis": "^105.0.0",
+    "google-auth-library": "^8.0.0"
+  },
+  "devDependencies": {
+    "electron": "^latest_version",
+    "electron-builder": "^latest_version"
+  },
+  "build": {
+    "appId": "com.your.desktopCalendar",
+    "productName": "Desktop Calendar",
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "files": [
+      "**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}",
+      "!**/node_modules/*.d.ts",
+      "!**/node_modules/.bin",
+      "!**/*.{iml,o,hprof,orig,pyc,pyo,rbc,swp,csproj,sln,xproj}",
+      "!.editorconfig",
+      "!**/._*",
+      "!**/{.DS_Store,.git,.hg,.svn,CVS,RCS,SCCS,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db,.flowconfig,.idea,.vs,.nyc_output}",
+      "!**/{appveyor.yml,.travis.yml,circle.yml}",
+      "!**/{npm-debug.log,yarn.lock,.yarn-integrity,.yarn-metadata.json}"
+    ],
+    "extraMetadata": {
+      "main": "main.js"
+    }
   }
 }
