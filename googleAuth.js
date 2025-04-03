@@ -13,7 +13,6 @@ const SCOPES = [
     'https://www.googleapis.com/auth/tasks.readonly'
 ];
 
-// Add this function to handle user input
 function getUserInput(question) {
     const rl = readline.createInterface({
         input: process.stdin,

@@ -4,11 +4,11 @@ const { google } = require('googleapis');
 const { getAuthClient } = require('./googleAuth');
 const AutoLaunch = require('auto-launch');
 
-// Create auto launcher with the full path to your app
+// Create auto launcher with the full path to the app
 const autoLauncher = new AutoLaunch({
     name: 'Desktop Calendar',
-    path: process.execPath,    // Use process.execPath instead of app.getPath('exe')
-    isHidden: true            // Hide the launch process
+    path: process.execPath,
+    isHidden: true
 });
 
 // Enable auto launch
@@ -152,7 +152,6 @@ app.whenReady().then(async () => {
         console.error('Error setting up calendar and tasks:', err);
     }
 
-    // Add this line after window creation
     app.commandLine.appendSwitch('disable-gpu-cache');
 });
 
